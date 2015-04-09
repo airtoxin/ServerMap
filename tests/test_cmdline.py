@@ -3,7 +3,7 @@
 
 from unittest import TestCase
 from nose.tools import ok_, eq_
-from cartographer.cmdline import main
+from servermap.cmdline import main
 
 class CmdlineTestCase(TestCase):
     def setUp(self):

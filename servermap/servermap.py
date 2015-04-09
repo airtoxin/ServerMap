@@ -3,8 +3,8 @@
 
 from __future__ import absolute_import
 
-class Cartographer(object):
-    """docstring for Cartographer"""
+class ServerMap(object):
+    """docstring for ServerMap"""
     def __init__(self, arg):
-        super(Cartographer, self).__init__()
+        super(ServerMap, self).__init__()
         self.arg = arg

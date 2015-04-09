@@ -3,4 +3,4 @@
 
 from __future__ import absolute_import
 
-from .cartographer import Cartographer
+from .servermap import ServerMap

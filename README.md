@@ -1,4 +1,4 @@
-# Cartographer
+# ServerMap
 
 Resource monitoring tool for servers.
 
@@ -7,6 +7,10 @@ Resource monitoring tool for servers.
 ### setup
 
 `$ virturlenv env && source venv/bin/activate`
+
+## test
+
+`$ nosetests`
 
 ### packaging
 

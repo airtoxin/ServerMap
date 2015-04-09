@@ -11,13 +11,13 @@ with open("README.md") as f:
     long_description = f.read()
 
 setup(
-    name="Cartographer",
+    name="ServerMap",
     version="0.1.0dev",
     description="Resource monitoring tool for servers.",
     long_description=long_description,
     author="airtoxin",
     author_email="airtoxin@icloud.com",
-    url="https://github.com/airtoxin/cartographer",
+    url="https://github.com/airtoxin/servermap",
     packages=find_packages(exclude=["docs"]),
     include_package_data=True,
     install_requires=install_requires,
