@@ -3,6 +3,8 @@
 
 from __future__ import absolute_import
 
+import web_interface
+
 def main():
     u"""Command line entry point"""
-    print "@main"
+    web_interface.run()
