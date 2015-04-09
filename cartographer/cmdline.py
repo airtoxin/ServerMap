@@ -3,8 +3,8 @@
 
 from __future__ import absolute_import
 
-import web_interface
+import dashboard
 
 def main():
     u"""Command line entry point"""
-    web_interface.run()
+    dashboard.run()
