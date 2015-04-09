@@ -16,7 +16,7 @@ if conf.getboolean("dashboard", "use_basic_auth"):
     app.config["BASIC_AUTH_USERNAME"] = conf.get("dashboard", "username")
     app.config["BASIC_AUTH_PASSWORD"] = conf.get("dashboard", "password")
 
-    basic_auth = BasicAuth(app)
+basic_auth = BasicAuth(app)
 
 def run():
     app.run(debug=True)
