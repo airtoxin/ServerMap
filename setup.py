@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import with_statement
+from __future__ import with_statement, absolute_import
 from setuptools import setup, find_packages
 
 with open("requirements.txt") as f:
