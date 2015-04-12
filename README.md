@@ -1,4 +1,4 @@
-# ServerMap
+# ServerMap [![experimental](http://badges.github.io/stability-badges/dist/experimental.svg)](http://github.com/badges/stability-badges)
 
 Resource monitoring tool for servers.
 
@@ -6,7 +6,7 @@ Resource monitoring tool for servers.
 
 ### setup
 
-`$ virturlenv env && source venv/bin/activate`
+`$ direnv edit .` → type `layout python`
 
 ## test
 
@@ -14,4 +14,13 @@ Resource monitoring tool for servers.
 
 ### packaging
 
-`$ python setup.py sdist`
+#### test
+
+upload: `python setup.py sdist upload -r https://testpypi.python.org/pypi`
+
+install: `pip install --index-url https://testpypi.python.org/simple/ servermap`
+
+#### production
+
+`python setup.py register`
+`python setup.py sdist upload`
