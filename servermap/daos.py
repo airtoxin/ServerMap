@@ -24,8 +24,11 @@ class MetricsDao(object):
 
     def bulk_set_metric(self, dictionaries):
         timestamp = time.time()
-        data = [d for d in dictionaries if ]
-        self.table.insert_multiple
+        for dictionary in dictionaries:
+            if not dictionary.has_key("timestamp"):
+                dictionary["timestamp"] = time.time()
+
+        self.table.insert_multiple(dictionaries)
 
     def get_metric_with_range(self, from_ts, to_ts):
         self.table.search(from_ts <= where("timestamp") < to_ts)
