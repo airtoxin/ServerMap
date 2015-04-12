@@ -1,21 +1,20 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import absolute_import
-from ConfigParser import SafeConfigParser
+from __future__ import with_statement, absolute_import
 from tinydb import TinyDB, where
-import time
+import time, json
 
-conf = SafeConfigParser()
-conf.read("config.ini")
+with open("config.json") as f:
+    conf = json.loads(f.read())
 
 class ServerMapDao(object):
     def __init__(self):
-        self.table = TinyDB(conf.get("db", "path")).table("servermap")
+        self.table = TinyDB(conf["db"]["path"]).table("servermap")
 
 class MetricsDao(object):
     def __init__(self, table_name):
-        self.table = TinyDB(conf.get("db", "path")).table("metrics_" + table_name)
+        self.table = TinyDB(conf["db"]["path"]).table("metrics_" + table_name)
 
     def set_metric(self, dictionary):
         if not dictionary.has_key("timestamp"):
