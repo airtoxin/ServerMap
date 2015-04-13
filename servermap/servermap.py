@@ -20,7 +20,7 @@ class ServerMap(object):
         sys.path.append("servermap/plugins")
         self.plugins = load_plugin("servermap_plugin_*")
         metricses = [
-            plugin.get_metrics(self.config["servers"])
+            plugin.Graph().get_metrics(self.config["servers"])
             for plugin in self.plugins
         ]
         for graph in metricses:
@@ -28,3 +28,4 @@ class ServerMap(object):
                 print metric
                 self.metrics_dao.set_metric(metric["graph_name"], metric)
 
+        print self.metrics_dao.get_daily_metrics("files")
