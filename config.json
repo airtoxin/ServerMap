@@ -1,5 +1,13 @@
 {
 	"db": {
-		"path": "~/db.json"
-	}
+		"path": "./db.json"
+	},
+	"servers": [
+		{
+			"host": "localhost"
+		},
+		{
+			"host": "localhost"
+		}
+	]
 }

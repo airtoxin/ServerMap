@@ -10,7 +10,7 @@ app = Flask(__name__)
 static_dir = path.join(app.root_path, "..", "static")
 
 def run():
-    app.run(debug=True)
+    app.run(debug=False)
 
 @app.route("/", methods=["GET"])
 def index():

@@ -7,6 +7,5 @@ from servermap import ServerMap
 import dashboard
 
 def main():
-    u"""Command line entry point"""
     ServerMap().main()
     dashboard.run()
