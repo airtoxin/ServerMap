@@ -4,10 +4,9 @@
 	},
 	"servers": [
 		{
-			"host": "localhost"
-		},
-		{
-			"host": "localhost"
+			"server_name": "test-vagrant",
+			"hostname": "vagrant@192.168.33.10",
+			"key_file": "~/.vagrant.d/insecure_private_key"
 		}
 	]
 }

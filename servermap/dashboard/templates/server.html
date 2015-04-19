@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+{% block content %}
+    <div class="flash">
+        <span class="octicon octicon-server"></span> {{server_name}}
+    </div>
+    {% for dim_name, dimension in dimensions.iteritems() | sort %}
+        <div>
+            <h2>{{dim_name}}</h2>
+            <div id="{{dim_name}}"></div>
+        </div>
+
+        <script type="text/javascript">
+            c3.generate({
+                bindto: '#{{dim_name}}',
+                size: {
+                    width: 730,
+                    height: 320
+                },
+                x: 'x',
+                data: {
+                    columns: _.map({{dimension.metrics | safe}}, function (metric, metricName) {
+                        var values = _.map(metric.points, function (p) {return p.value;});
+                        values.unshift(metricName)
+                        return values;
+                    })
+                },
+                color: {
+                    pattern: {{base.colors | safe}}
+                }
+            });
+        </script>
+    {% endfor %}
+{% endblock %}

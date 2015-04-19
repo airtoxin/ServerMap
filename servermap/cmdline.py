@@ -7,5 +7,5 @@ from servermap import ServerMap
 import dashboard
 
 def main():
-    ServerMap().main()
+    # ServerMap().main()
     dashboard.run()

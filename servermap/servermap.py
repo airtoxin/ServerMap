@@ -6,26 +6,23 @@ from __future__ import with_statement, absolute_import
 from plugin_loader import load_plugin
 import json, sys
 from fabric import state
-from daos import MetricsDao
+from daos import Dao
 
-state.output["everything"] = False # suppress fabric's output
+state.output["everything"] = False # suppress fabric's console output
 
 class ServerMap(object):
     def __init__(self):
         with open("config.json") as f:
             self.config = json.loads(f.read())
-            self.metrics_dao = MetricsDao()
+            self.dao = Dao()
 
     def main(self):
         sys.path.append("servermap/plugins")
-        self.plugins = load_plugin("servermap_plugin_*")
-        metricses = [
-            plugin.Graph().get_metrics(self.config["servers"])
-            for plugin in self.plugins
+        plugins = load_plugin("servermap_plugin_*")
+        dimensions = [
+            plugin.get_dimensions(self.config["servers"])
+            for plugin in plugins
         ]
-        for graph in metricses:
-            for metric in graph:
-                print metric
-                self.metrics_dao.set_metric(metric["graph_name"], metric)
-
-        print self.metrics_dao.get_daily_metrics("files")
+        for dimension in dimensions:
+            for metric in dimension:
+                self.dao.set_metric(metric)

@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link rel="stylesheet" type="text/css" href="/static/octicons.css">
+    <link rel="stylesheet" type="text/css" href="/static/primer.css">
+    <link rel="stylesheet" type="text/css" href="/static/c3.css">
+    <script type="text/javascript" src="/static/lodash.js"></script>
+    <script type="text/javascript" src="/static/d3.js" charset="utf-8"></script>
+    <script type="text/javascript" src="/static/c3.js"></script>
+    <title>ServerMap Dashboard</title>
+    <body class="container">
+        <header>
+            <div class="container">
+                <a href="/"><img class="avatar" src="/static/logo_long.png" height="50"></a>
+            </div>
+        </header>
+        <div class="columns">
+            <div class="one-fourth column">
+                <nav class="menu">
+                    <span class="menu-heading">Servers</span>
+                    {% for servername in base.servernames %}
+                        <a class="menu-item" href="/server/{{servername}}">{{servername}}</a>
+                    {% endfor %}
+                    <a class="menu-item" href="/all">All servers</a>
+                </nav>
+            </div>
+            <div class="three-fourths column">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </body>
+</html>

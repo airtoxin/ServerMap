@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+{% block content %}
+    <div class="columns" style="display:flex">
+        {% for server_name, server in servers.iteritems() | sort %}
+            <div class="column">
+                <div class="flash">
+                    <span class="octicon octicon-server"></span> {{server_name}}
+                </div>
+                {% for dim_name, dimension in server.dimensions.iteritems() | sort %}
+                    <div>
+                        <h2>{{dim_name}}</h2>
+                        <div id="{{server_name}}_{{dim_name}}"></div>
+                    </div>
+
+                    <script type="text/javascript">
+                        c3.generate({
+                            bindto: '#{{server_name}}_{{dim_name}}',
+                            size: {
+                                width: 730,
+                                height: 320
+                            },
+                            data: {
+                                columns: _.map({{dimension.metrics | safe}}, function (metric, metricName) {
+                                    console.log("metric:", metric);
+                                    return [ metricName, Math.random(), Math.random(), Math.random(), Math.random(), Math.random(), Math.random()];
+                                })
+                            },
+                            color: {
+                                pattern: {{base.colors | safe}}
+                            }
+                        });
+                    </script>
+                {% endfor %}
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
