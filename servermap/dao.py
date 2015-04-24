@@ -2,11 +2,14 @@
 # -*- coding: utf-8 -*-
 
 import sqlite3
+import json
 
 class Dao(object):
     def __init__(self):
+        with open("config.json") as f:
+            self.config = json.loads(f.read())
         super(Dao, self).__init__()
-        self.connection = sqlite3.connect(':memory:')
+        self.connection = sqlite3.connect(self.config["db"]["path"])
         self.cursor = self.connection.cursor()
 
         self.run_pragma()
@@ -82,7 +85,7 @@ class Dao(object):
         self.cursor.execute(query)
         self.connection.commit()
 
-    def save_server_data(self, s_name, host,
+    def save_server_data(self, server_name=None, host=None,
                          user=None, port=None,
                          key=None, password=None):
         query = u"""
@@ -90,11 +93,11 @@ class Dao(object):
                 ?, ?, ?, ?, ?, ?
             );
         """
-        t = (s_name, host, user, port, key, password)
+        t = (server_name, host, user, port, key, password)
         self.cursor.execute(query, t)
         self.connection.commit()
 
-    def save_dimension_data(self, dim_name,
+    def save_dimension_data(self, dimension_name=None,
                              description=None, version=None,
                              url=None, author=None, license=None):
         query = u"""
@@ -102,28 +105,29 @@ class Dao(object):
                 ?, ?, ?, ?, ?, ?
             );
         """
-        t = (dim_name, description, version, url, author, license)
+        t = (dimension_name, description, version, url, author, license)
         self.cursor.execute(query, t)
         self.connection.commit()
 
-    def save_metric_data(self, met_name, dim_name, unit, val_type):
+    def save_metric_data(self, metric_name=None, dimension_name=None,
+                         unit=None, value_type=None):
         query = """
             INSERT OR REPLACE INTO metrics VALUES(
                 ?, ?, ?, ?
             );
         """
-        t = (met_name, dim_name, unit, val_type)
+        t = (metric_name, dimension_name, unit, value_type)
         self.cursor.execute(query, t)
         self.connection.commit()
 
-    def save_datapoint_data(self, dim_name, met_name,
-                            host, value, timestamp):
+    def save_datapoint_data(self, dimension_name=None, metric_name=None,
+                            host=None, value=None, timestamp=None):
         query = """
             INSERT INTO datapoints VALUES(
                 ?, ?, ?, ?, ?
             );
         """
-        t = (dim_name, met_name, host, value, timestamp)
+        t = (dimension_name, metric_name, host, value, timestamp)
         self.cursor.execute(query, t)
         self.connection.commit()
 

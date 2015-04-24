@@ -1,19 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import re
 
 def assign_server(server, env):
     env.host_string = server["hostname"]
     env.key_filename = server["key_file"]
 
-def metric_formatter(server=None, dimension=None, metric=None, value=None, unit=None):
-    import time
-    return {
-        "server":    server,
-        "dimension": dimension,
-        "metric":    metric,
-        "timestamp": time.time(),
-        "data_point": {
-            "value": value,
-            "unit":  unit,
-        }
-    }
+_re_hostname = re.compile(r"^(.*@)?(.*)(:\d)?$")
+def get_user(hostname):
+    return _re_hostname.search(hostname).group(1)
+
+def get_host(hostname):
+    return _re_hostname.search(hostname).group(2)
+
+def get_port(hostname):
+    return _re_hostname.search(hostname).group(3)

@@ -1,6 +1,6 @@
 {
 	"db": {
-		"path": "./db.json"
+		"path": "test.db"
 	},
 	"servers": [
 		{
