@@ -21,8 +21,7 @@ setup(
         "Fabric",
         "Flask",
         "plugin-loader",
-        "schedule",
-        "tinydb"
+        "schedule"
     ],
     tests_require=["nose"],
     license="MIT",
