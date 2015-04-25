@@ -3,9 +3,12 @@
 
 from __future__ import absolute_import
 
+from apscheduler.schedulers.background import BackgroundScheduler as Scheduler
 from servermap import ServerMap
 import dashboard
 
 def main():
-    ServerMap().main()
+    scheduler = Scheduler()
+    scheduler.add_job(ServerMap().main, trigger='cron', minute='*/1')
+    scheduler.start()
     dashboard.run()
