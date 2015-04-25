@@ -9,6 +9,8 @@ import dashboard
 
 def main():
     scheduler = Scheduler()
-    scheduler.add_job(ServerMap().main, trigger='cron', minute='*/1')
+    servermap = ServerMap()
+    scheduler.add_job(servermap.reload, trigger='cron', minute='*/5')
+    scheduler.add_job(servermap.main, trigger='cron', minute='*/1')
     scheduler.start()
     dashboard.run()

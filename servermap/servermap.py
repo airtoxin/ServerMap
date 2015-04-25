@@ -13,17 +13,13 @@ state.output["everything"] = False # suppress fabric's console output
 
 class ServerMap(object):
     def __init__(self):
-        with open("config.json") as f:
-            self.config = json.loads(f.read())
         self.dao = Dao()
         sys.path.append("servermap/plugins")
         self.dimensions = load_plugin("servermap_dimension_*")
 
-        self.init_servers()
-        self.init_dimensions()
-        self.init_metrics()
+        self.reload()
 
-    def init_servers(self):
+    def load_servers(self):
         for server in self.config["servers"]:
             self.dao.save_server_data(
                 server_name=server["server_name"],
@@ -32,14 +28,21 @@ class ServerMap(object):
                 port=get_port(server["hostname"])
             )
 
-    def init_dimensions(self):
+    def load_dimensions(self):
         for dimension in self.dimensions:
             self.dao.save_dimension_data(**dimension.metadata())
 
-    def init_metrics(self):
+    def load_metrics(self):
         for dimension in self.dimensions:
             for metric in dimension.metric_metadata():
                 self.dao.save_metric_data(dimension_name=dimension.metadata()["dimension_name"], **metric)
+
+    def reload(self):
+        with open("config.json") as f:
+            self.config = json.loads(f.read())
+        self.load_servers()
+        self.load_dimensions()
+        self.load_metrics()
 
     def main(self):
         self.get_data()
