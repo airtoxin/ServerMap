@@ -21,7 +21,7 @@ setup(
         "Fabric",
         "Flask",
         "plugin-loader",
-        "schedule"
+        "apscheduler"
     ],
     tests_require=["nose"],
     license="MIT",
