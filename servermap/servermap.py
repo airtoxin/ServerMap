@@ -15,7 +15,6 @@ class ServerMap(object):
     def __init__(self):
         self.dao = Dao()
         sys.path.append("servermap/plugins")
-        self.dimensions = load_plugin("servermap_dimension_*")
 
         self.reload()
 
@@ -38,6 +37,9 @@ class ServerMap(object):
                 self.dao.save_metric_data(dimension_name=dimension.metadata()["dimension_name"], **metric)
 
     def reload(self):
+        self.dimensions = load_plugin("servermap_dimension_*")
+        for dimension in self.dimensions:
+            reload(dimension)
         with open("config.json") as f:
             self.config = json.loads(f.read())
         self.load_servers()
