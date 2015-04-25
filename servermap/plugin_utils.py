@@ -3,15 +3,12 @@
 import re
 
 def assign_server(server, env):
-    env.host_string = server["hostname"]
-    env.key_filename = server["key_file"]
+    host_string = server.get("host")
+    user = server.get("user")
+    port = server.get("port")
 
-_re_hostname = re.compile(r"^(.*@)?(.*)(:\d)?$")
-def get_user(hostname):
-    return _re_hostname.search(hostname).group(1)
+    if user is not None: host_string = str(user) + "@" + host_string
+    if port is not None: host_string = host_string + ":" + str(port)
 
-def get_host(hostname):
-    return _re_hostname.search(hostname).group(2)
-
-def get_port(hostname):
-    return _re_hostname.search(hostname).group(3)
+    env.host_string = host_string
+    env.key_filename = server.get("key")

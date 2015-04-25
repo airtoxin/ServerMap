@@ -23,7 +23,7 @@ setup(
         "plugin-loader",
         "apscheduler"
     ],
-    tests_require=["nose"],
+    tests_require=["pytest"],
     license="MIT",
     keywords="",
     zip_safe=False,

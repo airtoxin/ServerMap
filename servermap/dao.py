@@ -156,7 +156,7 @@ class Dao(object):
     def get_servers(self):
         connection, cursor = self.get_connection()
         query = """
-            SELECT server_name, host
+            SELECT *
             FROM servers
         """
         result = tuple(cursor.execute(query))

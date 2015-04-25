@@ -4,11 +4,11 @@
 from __future__ import with_statement, absolute_import
 
 from plugin_loader import load_plugin
-import json, sys
+import json, sys, logging
 from fabric import state
 from dao import Dao
-from plugin_utils import get_host, get_user, get_port
 
+logging.basicConfig(filename="system.log", level=logging.ERROR)
 state.output["everything"] = False # suppress fabric's console output
 
 class ServerMap(object):
@@ -19,13 +19,9 @@ class ServerMap(object):
         self.reload()
 
     def load_servers(self):
-        for server in self.config["servers"]:
-            self.dao.save_server_data(
-                server_name=server["server_name"],
-                host=get_host(server["hostname"]),
-                user=get_user(server["hostname"]),
-                port=get_port(server["hostname"])
-            )
+        for server in self.config.get("servers"):
+            hostname = server.get("hostname")
+            self.dao.save_server_data(**server)
 
     def load_dimensions(self):
         for dimension in self.dimensions:
@@ -34,7 +30,7 @@ class ServerMap(object):
     def load_metrics(self):
         for dimension in self.dimensions:
             for metric in dimension.metric_metadata():
-                self.dao.save_metric_data(dimension_name=dimension.metadata()["dimension_name"], **metric)
+                self.dao.save_metric_data(dimension_name=dimension.metadata().get("dimension_name"), **metric)
 
     def reload(self):
         self.dimensions = load_plugin("servermap_dimension_*")
@@ -51,13 +47,17 @@ class ServerMap(object):
 
     def get_data(self):
         for dimension in self.dimensions:
-            for server in self.config["servers"]:
-                for metric in dimension.get_metrics(server):
-                    datapoint = {
-                        "dimension_name": dimension.metadata()["dimension_name"],
-                        "metric_name": metric[0],
-                        "host": get_host(server["hostname"]),
-                        "value": metric[1],
-                        "timestamp": metric[2]
-                    }
-                    self.dao.save_datapoint_data(**datapoint)
+            for server in self.dao.get_servers():
+                # TODO: threading
+                try:
+                    for metric in dimension.get_metrics(server):
+                        datapoint = {
+                            "dimension_name": dimension.metadata().get("dimension_name"),
+                            "host": server.get("host"),
+                            "metric_name": metric[0],
+                            "value": metric[1],
+                            "timestamp": metric[2]
+                        }
+                        self.dao.save_datapoint_data(**datapoint)
+                except Exception as e:
+                    logging.error(str(e))
