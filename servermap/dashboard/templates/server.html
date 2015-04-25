@@ -16,7 +16,10 @@
                 return values;
             });
             var x = _.map({{dimension.metrics | tojson}}, function (metric, metricName) {
-                var timestamps = _.map(metric.points, function (p) {return p.timestamp * 1000;});
+                var timestamps = _.map(metric.points, function (p) {
+                    var d = new Date(p.timestamp * 1000);
+                    return Date.parse(d.toFormat('YYYY-MM-DD HH24:MI:00'))
+                });
                 timestamps.unshift('x');
                 return timestamps
             })[0];
