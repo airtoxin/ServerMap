@@ -4,7 +4,7 @@
 from __future__ import absolute_import
 from plugin_utils import assign_server
 from fabric.api import env, run, local
-import re
+import re, time
 
 def metadata():
     return {
@@ -46,6 +46,7 @@ def metric_metadata():
     ]
 
 def get_metrics(server):
+    ts = time.time()
     assign_server(server, env)
     mem = re.split(r"\s+", run("free | grep Mem:"))
     total   = int(mem[1])
@@ -55,10 +56,10 @@ def get_metrics(server):
     buffers = int(mem[5])
     cached  = int(mem[6])
     return [
-        ("total", total),
-        ("used", used),
-        ("free", free),
-        ("shared", shared),
-        ("buffers", buffers),
-        ("cached", cached)
+        ("total", total, ts),
+        ("used", used, ts),
+        ("free", free, ts),
+        ("shared", shared, ts),
+        ("buffers", buffers, ts),
+        ("cached", cached, ts)
     ]

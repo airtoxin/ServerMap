@@ -4,12 +4,10 @@
 from __future__ import with_statement, absolute_import
 
 from plugin_loader import load_plugin
-import json, sys, time
+import json, sys
 from fabric import state
 from dao import Dao
 from plugin_utils import get_host, get_user, get_port
-from pprint import PrettyPrinter as PP
-pp = PP(depth=4)
 
 state.output["everything"] = False # suppress fabric's console output
 
@@ -55,6 +53,6 @@ class ServerMap(object):
                         "metric_name": metric[0],
                         "host": get_host(server["hostname"]),
                         "value": metric[1],
-                        "timestamp": time.time()
+                        "timestamp": metric[2]
                     }
                     self.dao.save_datapoint_data(**datapoint)

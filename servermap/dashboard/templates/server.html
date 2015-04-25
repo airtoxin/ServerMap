@@ -10,22 +10,38 @@
         </div>
 
         <script type="text/javascript">
+            var columns = _.map({{dimension.metrics | tojson}}, function (metric, metricName) {
+                var values = _.map(metric.points, function (p) {return p.value;});
+                values.unshift(metricName);
+                return values;
+            });
+            var x = _.map({{dimension.metrics | tojson}}, function (metric, metricName) {
+                var timestamps = _.map(metric.points, function (p) {return p.timestamp * 1000;});
+                timestamps.unshift('x');
+                return timestamps
+            })[0];
+            columns.unshift(x);
+
             c3.generate({
                 bindto: '#d_{{dim_name | replace('.', '_')}}',
                 size: {
                     width: 730,
                     height: 320
                 },
-                x: 'x',
                 data: {
-                    columns: _.map({{dimension.metrics | tojson}}, function (metric, metricName) {
-                        var values = _.map(metric.points, function (p) {return p.value;});
-                        values.unshift(metricName)
-                        return values;
-                    })
+                    x: 'x',
+                    columns: columns
                 },
                 color: {
                     pattern: {{base.colors | tojson}}
+                },
+                axis: {
+                    x: {
+                        type: 'timeseries',
+                        tick: {
+                            format: '%Y-%m-%d %H:%M'
+                        }
+                    }
                 }
             });
         </script>
