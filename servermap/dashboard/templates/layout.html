@@ -18,8 +18,8 @@
             <div class="one-fourth column">
                 <nav class="menu">
                     <span class="menu-heading">Servers</span>
-                    {% for servername in base.servernames %}
-                        <a class="menu-item" href="/server/{{servername}}">{{servername}}</a>
+                    {% for server in base.servers %}
+                        <a class="menu-item" href="/server/{{server['host']}}">{{server['server_name']}}</a>
                     {% endfor %}
                     <a class="menu-item" href="/all">All servers</a>
                 </nav>

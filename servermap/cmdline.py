@@ -8,4 +8,4 @@ import dashboard
 
 def main():
     ServerMap().main()
-    # dashboard.run()
+    dashboard.run()

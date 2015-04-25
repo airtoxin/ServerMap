@@ -2,12 +2,16 @@
 # -*- coding: utf-8 -*-
 
 import json, time
+from itertools import groupby
 from flask import (Flask, render_template,
                    send_from_directory, url_for)
+from dao import Dao
+
 app = Flask(__name__, static_url_path="/static")
+dao = Dao()
 
 base = {
-    "servernames": ["dev01", "log01"],
+    "servers": dao.get_servers(),
     "colors": [
         '#4183c4', '#6cc644', '#bd2c00', '#FF9933', '#6e5494',
         '#56aef4', '#8fff55', '#fb3a00', '#ffcb3f', '#926fb8',
@@ -26,237 +30,60 @@ def route_servers():
         base=base
     )
 
-@app.route("/server/<server_name>")
-def route_server(server_name):
+@app.route("/server/<host>")
+def route_server(host):
+    server_name = dao.get_server_name_by_host(host)
+    raw = dao.get_metrics_data(host, 0, 1000000000000000)
+    dimensions = {
+        d[0]: {
+            "metrics": {
+                m[0][0]: {
+                    "unit": m[0][1],
+                    "points": [
+                        {
+                            "value": d["value"],
+                            "timestamp": d["timestamp"]
+                        }
+                    for d in m[1]]
+                }
+            for m in groupby(d[1], key=lambda x: (x["metric_name"], x["unit"]))}
+        }
+    for d in groupby(raw, key=lambda x: x["dimension_name"])}
+
     return render_template(
         "server.html",
         base=base,
         server_name=server_name,
-        dimensions={
-            "Memory": {
-                "metrics": {
-                    "Total": {
-                        "unit": "count",
-                        "points": [
-                            { "value": 100, "timestamp": time.mktime(time.strptime("2015 04 01 00 00", "%Y %m %d %H %M")) },
-                            { "value": 200, "timestamp": time.mktime(time.strptime("2015 04 01 00 05", "%Y %m %d %H %M")) },
-                            { "value": 300, "timestamp": time.mktime(time.strptime("2015 04 01 00 10", "%Y %m %d %H %M")) },
-                            { "value": 600, "timestamp": time.mktime(time.strptime("2015 04 01 00 15", "%Y %m %d %H %M")) },
-                            { "value": 500, "timestamp": time.mktime(time.strptime("2015 04 01 00 20", "%Y %m %d %H %M")) },
-                            { "value": 600, "timestamp": time.mktime(time.strptime("2015 04 01 00 25", "%Y %m %d %H %M")) },
-                            { "value": 400, "timestamp": time.mktime(time.strptime("2015 04 01 00 30", "%Y %m %d %H %M")) },
-                            { "value": 800, "timestamp": time.mktime(time.strptime("2015 04 01 00 35", "%Y %m %d %H %M")) },
-                            { "value": 900, "timestamp": time.mktime(time.strptime("2015 04 01 00 40", "%Y %m %d %H %M")) }
-                        ]
-                    },
-                    "Free": {
-                        "unit": "count",
-                        "points": [
-                            { "value": 682, "timestamp": time.mktime(time.strptime("2015 04 01 00 00", "%Y %m %d %H %M")) },
-                            { "value": 745, "timestamp": time.mktime(time.strptime("2015 04 01 00 05", "%Y %m %d %H %M")) },
-                            { "value": 742, "timestamp": time.mktime(time.strptime("2015 04 01 00 10", "%Y %m %d %H %M")) },
-                            { "value": 985, "timestamp": time.mktime(time.strptime("2015 04 01 00 15", "%Y %m %d %H %M")) },
-                            { "value": 278, "timestamp": time.mktime(time.strptime("2015 04 01 00 20", "%Y %m %d %H %M")) },
-                            { "value": 554, "timestamp": time.mktime(time.strptime("2015 04 01 00 25", "%Y %m %d %H %M")) },
-                            { "value": 845, "timestamp": time.mktime(time.strptime("2015 04 01 00 30", "%Y %m %d %H %M")) },
-                            { "value": 945, "timestamp": time.mktime(time.strptime("2015 04 01 00 35", "%Y %m %d %H %M")) },
-                            { "value": 374, "timestamp": time.mktime(time.strptime("2015 04 01 00 40", "%Y %m %d %H %M")) }
-                        ]
-                    }
-                }
-            },
-            "DiscIO": {
-                "metrics": {
-                    "Wait": {
-                        "unit": "count",
-                        "points": [
-                            { "value": 900, "timestamp": time.mktime(time.strptime("2015 04 01 00 00", "%Y %m %d %H %M")) },
-                            { "value": 800, "timestamp": time.mktime(time.strptime("2015 04 01 00 05", "%Y %m %d %H %M")) },
-                            { "value": 700, "timestamp": time.mktime(time.strptime("2015 04 01 00 10", "%Y %m %d %H %M")) },
-                            { "value": 600, "timestamp": time.mktime(time.strptime("2015 04 01 00 15", "%Y %m %d %H %M")) },
-                            { "value": 500, "timestamp": time.mktime(time.strptime("2015 04 01 00 20", "%Y %m %d %H %M")) },
-                            { "value": 400, "timestamp": time.mktime(time.strptime("2015 04 01 00 25", "%Y %m %d %H %M")) },
-                            { "value": 300, "timestamp": time.mktime(time.strptime("2015 04 01 00 30", "%Y %m %d %H %M")) },
-                            { "value": 200, "timestamp": time.mktime(time.strptime("2015 04 01 00 35", "%Y %m %d %H %M")) },
-                            { "value": 100, "timestamp": time.mktime(time.strptime("2015 04 01 00 40", "%Y %m %d %H %M")) }
-                        ]
-                    },
-                    "Read kBps": {
-                        "unit": "count",
-                        "points": [
-                            { "value": 100, "timestamp": time.mktime(time.strptime("2015 04 01 00 00", "%Y %m %d %H %M")) },
-                            { "value": 200, "timestamp": time.mktime(time.strptime("2015 04 01 00 05", "%Y %m %d %H %M")) },
-                            { "value": 300, "timestamp": time.mktime(time.strptime("2015 04 01 00 10", "%Y %m %d %H %M")) },
-                            { "value": 600, "timestamp": time.mktime(time.strptime("2015 04 01 00 15", "%Y %m %d %H %M")) },
-                            { "value": 500, "timestamp": time.mktime(time.strptime("2015 04 01 00 20", "%Y %m %d %H %M")) },
-                            { "value": 600, "timestamp": time.mktime(time.strptime("2015 04 01 00 25", "%Y %m %d %H %M")) },
-                            { "value": 400, "timestamp": time.mktime(time.strptime("2015 04 01 00 30", "%Y %m %d %H %M")) },
-                            { "value": 800, "timestamp": time.mktime(time.strptime("2015 04 01 00 35", "%Y %m %d %H %M")) },
-                            { "value": 900, "timestamp": time.mktime(time.strptime("2015 04 01 00 40", "%Y %m %d %H %M")) }
-                        ]
-                    },
-                    "Write kBps": {
-                        "unit": "count",
-                        "points": [
-                            { "value": 100, "timestamp": time.mktime(time.strptime("2015 04 01 00 00", "%Y %m %d %H %M")) },
-                            { "value": 200, "timestamp": time.mktime(time.strptime("2015 04 01 00 05", "%Y %m %d %H %M")) },
-                            { "value": 300, "timestamp": time.mktime(time.strptime("2015 04 01 00 10", "%Y %m %d %H %M")) },
-                            { "value": 400, "timestamp": time.mktime(time.strptime("2015 04 01 00 15", "%Y %m %d %H %M")) },
-                            { "value": 500, "timestamp": time.mktime(time.strptime("2015 04 01 00 20", "%Y %m %d %H %M")) },
-                            { "value": 600, "timestamp": time.mktime(time.strptime("2015 04 01 00 25", "%Y %m %d %H %M")) },
-                            { "value": 700, "timestamp": time.mktime(time.strptime("2015 04 01 00 30", "%Y %m %d %H %M")) },
-                            { "value": 800, "timestamp": time.mktime(time.strptime("2015 04 01 00 35", "%Y %m %d %H %M")) },
-                            { "value": 900, "timestamp": time.mktime(time.strptime("2015 04 01 00 40", "%Y %m %d %H %M")) }
-                        ]
-                    }
-                }
-            }
-        }
+        dimensions=dimensions
     )
 
 @app.route("/all")
 def route_all():
+    raw = dao.get_all_metrics_data(0, 10000000000000)
+    servers = {
+        s[0]: {
+            "dimensions": {
+                d[0]: {
+                    "metrics": {
+                        m[0][0]: {
+                            "unit": m[0][1],
+                            "points": [
+                                {
+                                    "value": d["value"],
+                                    "timestamp": d["timestamp"]
+                                }
+                            for d in m[1]]
+                        }
+                    for m in groupby(d[1], key=lambda x: (x["metric_name"], x["unit"]))}
+                }
+            for d in groupby(s[1], key=lambda x: x["dimension_name"])}
+        }
+    for s in groupby(raw, key=lambda x: (x["host"], x["server_name"]))}
+
     return render_template(
         "all.html",
         base=base,
-        servers={
-            "dev01": {
-                "dimensions": {
-                    "Memory": {
-                        "metrics": {
-                            "Total": {
-                                "unit": "count",
-                                "points": [
-                                    { "value": 100, "timestamp": time.mktime(time.strptime("2015 04 01 00 00", "%Y %m %d %H %M")) },
-                                    { "value": 200, "timestamp": time.mktime(time.strptime("2015 04 01 00 05", "%Y %m %d %H %M")) },
-                                    { "value": 300, "timestamp": time.mktime(time.strptime("2015 04 01 00 10", "%Y %m %d %H %M")) },
-                                    { "value": 400, "timestamp": time.mktime(time.strptime("2015 04 01 00 15", "%Y %m %d %H %M")) },
-                                    { "value": 500, "timestamp": time.mktime(time.strptime("2015 04 01 00 20", "%Y %m %d %H %M")) },
-                                    { "value": 600, "timestamp": time.mktime(time.strptime("2015 04 01 00 25", "%Y %m %d %H %M")) },
-                                    { "value": 700, "timestamp": time.mktime(time.strptime("2015 04 01 00 30", "%Y %m %d %H %M")) },
-                                    { "value": 800, "timestamp": time.mktime(time.strptime("2015 04 01 00 35", "%Y %m %d %H %M")) },
-                                    { "value": 900, "timestamp": time.mktime(time.strptime("2015 04 01 00 40", "%Y %m %d %H %M")) }
-                                ]
-                            },
-                            "Free": {
-                                "unit": "count",
-                                "points": [
-                                    { "value": 100, "timestamp": time.mktime(time.strptime("2015 04 01 00 00", "%Y %m %d %H %M")) },
-                                    { "value": 200, "timestamp": time.mktime(time.strptime("2015 04 01 00 05", "%Y %m %d %H %M")) },
-                                    { "value": 300, "timestamp": time.mktime(time.strptime("2015 04 01 00 10", "%Y %m %d %H %M")) },
-                                    { "value": 600, "timestamp": time.mktime(time.strptime("2015 04 01 00 15", "%Y %m %d %H %M")) },
-                                    { "value": 500, "timestamp": time.mktime(time.strptime("2015 04 01 00 20", "%Y %m %d %H %M")) },
-                                    { "value": 600, "timestamp": time.mktime(time.strptime("2015 04 01 00 25", "%Y %m %d %H %M")) },
-                                    { "value": 400, "timestamp": time.mktime(time.strptime("2015 04 01 00 30", "%Y %m %d %H %M")) },
-                                    { "value": 800, "timestamp": time.mktime(time.strptime("2015 04 01 00 35", "%Y %m %d %H %M")) },
-                                    { "value": 900, "timestamp": time.mktime(time.strptime("2015 04 01 00 40", "%Y %m %d %H %M")) }
-                                ]
-                            }
-                        }
-                    },
-                    "DiscIO": {
-                        "metrics": {
-                            "Max": {
-                                "unit": "count",
-                                "points": [
-                                    { "value": 100, "timestamp": time.mktime(time.strptime("2015 04 01 00 00", "%Y %m %d %H %M")) },
-                                    { "value": 200, "timestamp": time.mktime(time.strptime("2015 04 01 00 05", "%Y %m %d %H %M")) },
-                                    { "value": 300, "timestamp": time.mktime(time.strptime("2015 04 01 00 10", "%Y %m %d %H %M")) },
-                                    { "value": 600, "timestamp": time.mktime(time.strptime("2015 04 01 00 15", "%Y %m %d %H %M")) },
-                                    { "value": 500, "timestamp": time.mktime(time.strptime("2015 04 01 00 20", "%Y %m %d %H %M")) },
-                                    { "value": 600, "timestamp": time.mktime(time.strptime("2015 04 01 00 25", "%Y %m %d %H %M")) },
-                                    { "value": 400, "timestamp": time.mktime(time.strptime("2015 04 01 00 30", "%Y %m %d %H %M")) },
-                                    { "value": 800, "timestamp": time.mktime(time.strptime("2015 04 01 00 35", "%Y %m %d %H %M")) },
-                                    { "value": 900, "timestamp": time.mktime(time.strptime("2015 04 01 00 40", "%Y %m %d %H %M")) }
-                                ]
-                            },
-                            "Average": {
-                                "unit": "count",
-                                "points": [
-                                    { "value": 900, "timestamp": time.mktime(time.strptime("2015 04 01 00 00", "%Y %m %d %H %M")) },
-                                    { "value": 800, "timestamp": time.mktime(time.strptime("2015 04 01 00 05", "%Y %m %d %H %M")) },
-                                    { "value": 700, "timestamp": time.mktime(time.strptime("2015 04 01 00 10", "%Y %m %d %H %M")) },
-                                    { "value": 600, "timestamp": time.mktime(time.strptime("2015 04 01 00 15", "%Y %m %d %H %M")) },
-                                    { "value": 500, "timestamp": time.mktime(time.strptime("2015 04 01 00 20", "%Y %m %d %H %M")) },
-                                    { "value": 400, "timestamp": time.mktime(time.strptime("2015 04 01 00 25", "%Y %m %d %H %M")) },
-                                    { "value": 300, "timestamp": time.mktime(time.strptime("2015 04 01 00 30", "%Y %m %d %H %M")) },
-                                    { "value": 200, "timestamp": time.mktime(time.strptime("2015 04 01 00 35", "%Y %m %d %H %M")) },
-                                    { "value": 100, "timestamp": time.mktime(time.strptime("2015 04 01 00 40", "%Y %m %d %H %M")) }
-                                ]
-                            }
-                        }
-                    }
-                }
-            },
-            "log01": {
-                "dimensions": {
-                    "Memory": {
-                        "metrics": {
-                            "Total": {
-                                "unit": "count",
-                                "points": [
-                                    { "value": 900, "timestamp": time.mktime(time.strptime("2015 04 01 00 00", "%Y %m %d %H %M")) },
-                                    { "value": 800, "timestamp": time.mktime(time.strptime("2015 04 01 00 05", "%Y %m %d %H %M")) },
-                                    { "value": 700, "timestamp": time.mktime(time.strptime("2015 04 01 00 10", "%Y %m %d %H %M")) },
-                                    { "value": 600, "timestamp": time.mktime(time.strptime("2015 04 01 00 15", "%Y %m %d %H %M")) },
-                                    { "value": 500, "timestamp": time.mktime(time.strptime("2015 04 01 00 20", "%Y %m %d %H %M")) },
-                                    { "value": 400, "timestamp": time.mktime(time.strptime("2015 04 01 00 25", "%Y %m %d %H %M")) },
-                                    { "value": 300, "timestamp": time.mktime(time.strptime("2015 04 01 00 30", "%Y %m %d %H %M")) },
-                                    { "value": 200, "timestamp": time.mktime(time.strptime("2015 04 01 00 35", "%Y %m %d %H %M")) },
-                                    { "value": 100, "timestamp": time.mktime(time.strptime("2015 04 01 00 40", "%Y %m %d %H %M")) }
-                                ]
-                            },
-                            "Free": {
-                                "unit": "count",
-                                "points": [
-                                    { "value": 100, "timestamp": time.mktime(time.strptime("2015 04 01 00 00", "%Y %m %d %H %M")) },
-                                    { "value": 200, "timestamp": time.mktime(time.strptime("2015 04 01 00 05", "%Y %m %d %H %M")) },
-                                    { "value": 300, "timestamp": time.mktime(time.strptime("2015 04 01 00 10", "%Y %m %d %H %M")) },
-                                    { "value": 400, "timestamp": time.mktime(time.strptime("2015 04 01 00 15", "%Y %m %d %H %M")) },
-                                    { "value": 500, "timestamp": time.mktime(time.strptime("2015 04 01 00 20", "%Y %m %d %H %M")) },
-                                    { "value": 600, "timestamp": time.mktime(time.strptime("2015 04 01 00 25", "%Y %m %d %H %M")) },
-                                    { "value": 700, "timestamp": time.mktime(time.strptime("2015 04 01 00 30", "%Y %m %d %H %M")) },
-                                    { "value": 800, "timestamp": time.mktime(time.strptime("2015 04 01 00 35", "%Y %m %d %H %M")) },
-                                    { "value": 900, "timestamp": time.mktime(time.strptime("2015 04 01 00 40", "%Y %m %d %H %M")) }
-                                ]
-                            }
-                        }
-                    },
-                    "DiscIO": {
-                        "metrics": {
-                            "Max": {
-                                "unit": "count",
-                                "points": [
-                                    { "value": 900, "timestamp": time.mktime(time.strptime("2015 04 01 00 00", "%Y %m %d %H %M")) },
-                                    { "value": 800, "timestamp": time.mktime(time.strptime("2015 04 01 00 05", "%Y %m %d %H %M")) },
-                                    { "value": 700, "timestamp": time.mktime(time.strptime("2015 04 01 00 10", "%Y %m %d %H %M")) },
-                                    { "value": 600, "timestamp": time.mktime(time.strptime("2015 04 01 00 15", "%Y %m %d %H %M")) },
-                                    { "value": 500, "timestamp": time.mktime(time.strptime("2015 04 01 00 20", "%Y %m %d %H %M")) },
-                                    { "value": 400, "timestamp": time.mktime(time.strptime("2015 04 01 00 25", "%Y %m %d %H %M")) },
-                                    { "value": 300, "timestamp": time.mktime(time.strptime("2015 04 01 00 30", "%Y %m %d %H %M")) },
-                                    { "value": 200, "timestamp": time.mktime(time.strptime("2015 04 01 00 35", "%Y %m %d %H %M")) },
-                                    { "value": 100, "timestamp": time.mktime(time.strptime("2015 04 01 00 40", "%Y %m %d %H %M")) }
-                                ]
-                            },
-                            "Average": {
-                                "unit": "count",
-                                "points": [
-                                    { "value": 100, "timestamp": time.mktime(time.strptime("2015 04 01 00 00", "%Y %m %d %H %M")) },
-                                    { "value": 200, "timestamp": time.mktime(time.strptime("2015 04 01 00 05", "%Y %m %d %H %M")) },
-                                    { "value": 300, "timestamp": time.mktime(time.strptime("2015 04 01 00 10", "%Y %m %d %H %M")) },
-                                    { "value": 400, "timestamp": time.mktime(time.strptime("2015 04 01 00 15", "%Y %m %d %H %M")) },
-                                    { "value": 500, "timestamp": time.mktime(time.strptime("2015 04 01 00 20", "%Y %m %d %H %M")) },
-                                    { "value": 600, "timestamp": time.mktime(time.strptime("2015 04 01 00 25", "%Y %m %d %H %M")) },
-                                    { "value": 700, "timestamp": time.mktime(time.strptime("2015 04 01 00 30", "%Y %m %d %H %M")) },
-                                    { "value": 800, "timestamp": time.mktime(time.strptime("2015 04 01 00 35", "%Y %m %d %H %M")) },
-                                    { "value": 900, "timestamp": time.mktime(time.strptime("2015 04 01 00 40", "%Y %m %d %H %M")) }
-                                ]
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        servers=servers
     )
 
 def run():

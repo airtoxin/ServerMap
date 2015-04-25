@@ -3,29 +3,29 @@
     <div class="flash">
         <span class="octicon octicon-server"></span> {{server_name}}
     </div>
-    {% for dim_name, dimension in dimensions.iteritems() | sort %}
+    {% for dim_name, dimension in dimensions.iteritems() %}
         <div>
             <h2>{{dim_name}}</h2>
-            <div id="{{dim_name}}"></div>
+            <div id="d_{{dim_name | replace('.', '_')}}"></div>
         </div>
 
         <script type="text/javascript">
             c3.generate({
-                bindto: '#{{dim_name}}',
+                bindto: '#d_{{dim_name | replace('.', '_')}}',
                 size: {
                     width: 730,
                     height: 320
                 },
                 x: 'x',
                 data: {
-                    columns: _.map({{dimension.metrics | safe}}, function (metric, metricName) {
+                    columns: _.map({{dimension.metrics | tojson}}, function (metric, metricName) {
                         var values = _.map(metric.points, function (p) {return p.value;});
                         values.unshift(metricName)
                         return values;
                     })
                 },
                 color: {
-                    pattern: {{base.colors | safe}}
+                    pattern: {{base.colors | tojson}}
                 }
             });
         </script>
